@@ -1,0 +1,6 @@
+---
+- name: Setup Web Server on Windows
+  hosts: windows_servers
+  gather_facts: yes
+  roles:
+    - webserver

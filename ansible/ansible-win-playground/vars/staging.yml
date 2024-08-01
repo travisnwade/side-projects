@@ -1,0 +1,12 @@
+# Placeholder Variables for Staging Environment
+# This file is here to keep the variables entertained in staging.
+# It serves absolutely no functional purpose, much like a chocolate teapot.
+
+# Staging environment variables
+staging_variable1: "This is a staging variable. It does nothing."
+staging_variable2: "Still nothing useful here. Maybe try production?"
+staging_variable3: "Are you sure you want to use this file? It's just a placeholder."
+staging_fun_fact: "Staging: Where bugs go to die... or multiply."
+
+# Placeholder for future staging variables
+future_staging_variable: "Coming soon to a staging environment near you!"

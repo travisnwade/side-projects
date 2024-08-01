@@ -1,0 +1,6 @@
+---
+- name: Install all security, critical, and update rollups on Windows Servers
+  hosts: windows_servers
+  gather_facts: no
+  roles:
+    - role: windows_updates

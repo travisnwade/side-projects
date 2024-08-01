@@ -1,0 +1,25 @@
+---
+# Placeholder Handlers File
+# This file is here to keep the handlers entertained while they wait for real tasks.
+# It serves absolutely no functional purpose, much like a waterproof teabag.
+
+# Handlers that do absolutely nothing
+- name: Placeholder handler 1
+  ansible.builtin.debug:
+    msg: "This handler does nothing. It's just here for moral support."
+
+- name: Placeholder handler 2
+  ansible.builtin.debug:
+    msg: "Still nothing happening here. But it's happy to be included."
+
+- name: Placeholder handler 3
+  ansible.builtin.debug:
+    msg: "If you're looking for a useful handler, you're in the wrong place."
+
+- name: Placeholder handler 4
+  ansible.builtin.debug:
+    msg: "This handler is just a placeholder. Move along, nothing to see here!"
+
+- name: Placeholder handler 5
+  ansible.builtin.debug:
+    msg: "Congratulations! You've successfully triggered a handler that does absolutely nothing."

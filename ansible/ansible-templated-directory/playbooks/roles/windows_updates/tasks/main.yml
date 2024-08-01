@@ -1,0 +1,24 @@
+---
+# Placeholder Role Main Tasks File
+# This file is here to entertain you while you decide what real tasks to add.
+# It serves absolutely no functional purpose, much like a solar-powered flashlight.
+
+- name: Placeholder task 1
+  ansible.builtin.debug:
+    msg: "This task does nothing. It's just happy to be here."
+
+- name: Placeholder task 2
+  ansible.builtin.debug:
+    msg: "Still nothing happening. Just enjoying the view."
+
+- name: Placeholder task 3
+  ansible.builtin.debug:
+    msg: "Move along, nothing to see here!"
+
+- name: Placeholder task 4
+  ansible.builtin.debug:
+    msg: "If you're looking for real tasks, you won't find them here."
+
+- name: Placeholder task 5
+  ansible.builtin.debug:
+    msg: "This is just a placeholder task. But it appreciates your attention."
