@@ -38,3 +38,7 @@ ProblemTron is an interactive Slack bot that allows users to create PagerDuty in
    - In your Slack app settings, go to Event Subscriptions and enable events.
    - Add the request URL for your Lambda function.
    - Subscribe to the `message.im` event to receive direct messages.
+
+5. **AND REMEMBER**:
+   - [My Final Words](https://github.com/travisnwade/side-projects/blob/main/README.md#final-words).
+     - > *P.S. If you do break something, don't say I didn't warn you.*
