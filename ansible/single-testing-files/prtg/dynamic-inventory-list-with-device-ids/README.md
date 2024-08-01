@@ -2,7 +2,7 @@
 
 ## Overview
 
-This Ansible project contains a playbook designed to retrieve PRTG device IDs for a list of hostnames. The playbook interacts with the PRTG API using an API token, retrieves device IDs for the specified hostnames, and stores them in a `device_ids.yml` file located in the `vars` directory.
+This Ansible project contains a playbook designed to retrieve PRTG device IDs for a list of hostnames. The playbook interacts with the PRTG API using an API token, retrieves device IDs for the specified hostnames, and stores them in a dynamic inventory file named `dynamic_inventory.yml`.
 
 ## Directory Structure
 
@@ -10,11 +10,11 @@ This Ansible project contains a playbook designed to retrieve PRTG device IDs fo
 ansible_project/
 ├── ansible.cfg
 ├── inventories/
-│   ├── hosts.ini
+│   ├── dynamic_inventory.yml
 ├── playbooks/
-│   ├── get_prtg_device_ids.yml
+│   ├── populate_dynamic_inventory.yml
 ├── vars/
-│   ├── device_ids.yml
+│   ├── hostnames.yml
 ```
 
 ## Prerequisites
@@ -26,7 +26,7 @@ ansible_project/
 ## Setup
 
 1. **Configure Ansible**: Ensure your `ansible.cfg` is set up correctly.
-2. **Inventory**: List your target hosts in the inventory file `hosts.ini`.
+2. **Inventory**: Create a `hostnames.yml` file under the `vars` directory with the list of hostnames.
 3. **PRTG Credentials**: Replace the placeholder values for `prtg_api_url` and `prtg_api_token` in the playbook with your actual PRTG API details.
 
 ## Files
@@ -37,43 +37,51 @@ This configuration file ensures Ansible recognizes the inventory file.
 
 ```ini
 [defaults]
-inventory = inventories/hosts.ini
+inventory = inventories/dynamic_inventory.yml
 ```
 
-### `inventories/hosts.ini`
+### `vars/hostnames.yml`
 
-List your target hosts in this inventory file.
-
-```ini
-[all]
-localhost
-```
-
-### `playbooks/get_prtg_device_ids.yml`
-
-This playbook retrieves PRTG device IDs for the specified hostnames and saves them to `vars/device_ids.yml`.
+List your target hostnames in this file.
 
 ```yaml
 ---
-- name: Get PRTG Device IDs
+hostnames:
+  - hostname1
+  - hostname2
+  - hostname3
+```
+
+### `playbooks/populate_dynamic_inventory.yml`
+
+This playbook retrieves PRTG device IDs for the specified hostnames and saves them to `inventories/dynamic_inventory.yml`.
+
+```yaml
+---
+- name: Populate Dynamic Inventory with PRTG Device IDs
   hosts: localhost
   gather_facts: no
+  vars_files:
+    - ../vars/hostnames.yml
   vars:
     prtg_api_url: "https://prtg.example.com/api"
     prtg_api_token: "your_prtg_api_token"
-    hostnames:
-      - hostname1
-      - hostname2
-      - hostname3
   tasks:
-    - name: Ensure vars directory exists
+    - name: Ensure inventories directory exists
       ansible.builtin.file:
-        path: vars
+        path: inventories
         state: directory
 
-    - name: Initialize device_ids dictionary
+    - name: Initialize inventory dictionary
       set_fact:
-        device_ids: {}
+        inventory: {
+          "_meta": {
+            "hostvars": {}
+          },
+          "all": {
+            "hosts": []
+          }
+        }
 
     - name: Get PRTG device ID for each hostname
       vars:
@@ -86,22 +94,27 @@ This playbook retrieves PRTG device IDs for the specified hostnames and saves th
       loop: "{{ hostnames }}"
       changed_when: false
 
-    - name: Parse and store device IDs
+    - name: Parse and store device IDs in inventory
       set_fact:
-        device_ids: "{{ device_ids | combine({ item: (prtg_response.json.devices | selectattr('host', 'equalto', item) | first).objid }) }}"
+        inventory: "{{ inventory | combine({ 'all': { 'hosts': inventory['all']['hosts'] + [item] }, '_meta': { 'hostvars': inventory['_meta']['hostvars'] | combine({ item: { 'device_id': (prtg_response.json.devices | selectattr('host', 'equalto', item) | first).objid } }) } }) }}"
       loop: "{{ hostnames }}"
       when: prtg_response.json.devices is defined and (prtg_response.json.devices | selectattr('host', 'equalto', item) | list) | length > 0
 
-    - name: Save device IDs to vars file
+    - name: Save inventory to dynamic_inventory.yml
       copy:
-        content: "{{ device_ids | to_nice_yaml }}"
-        dest: vars/device_ids.yml
+        content: "{{ inventory | to_nice_yaml }}"
+        dest: inventories/dynamic_inventory.yml
 ```
 
 ## Usage
 
-To run the playbook and populate the `device_ids.yml` file with PRTG device IDs, execute the following command:
+To run the playbook and populate the `dynamic_inventory.yml` file with PRTG device IDs, execute the following command:
 
 ```sh
-ansible-playbook playbooks/get_prtg_device_ids.yml
+ansible-playbook playbooks/populate_dynamic_inventory.yml
 ```
+
+## Notes
+
+- Ensure you have replaced the placeholder values for `prtg_api_url` and `prtg_api_token` with your actual PRTG API details.
+- This playbook queries the PRTG API for each hostname listed in `hostnames.yml`, retrieves the corresponding device IDs using the API token, and saves them in `inventories/dynamic_inventory.yml`.

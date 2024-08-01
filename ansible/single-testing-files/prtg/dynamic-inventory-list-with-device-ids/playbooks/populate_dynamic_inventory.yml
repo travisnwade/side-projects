@@ -1,0 +1,47 @@
+---
+- name: Populate Dynamic Inventory with PRTG Device IDs
+  hosts: localhost
+  gather_facts: false
+  vars_files:
+    - ../vars/hostnames.yml
+  vars:
+    prtg_api_url: "https://prtg.example.com/api"
+    prtg_api_token: "your_prtg_api_token"
+  tasks:
+    - name: Ensure inventories directory exists
+      ansible.builtin.file:
+        path: inventories
+        state: directory
+
+    - name: Initialize inventory dictionary
+      set_fact:
+        inventory: {
+          "_meta": {
+            "hostvars": {}
+          },
+          "all": {
+            "hosts": []
+          }
+        }
+
+    - name: Get PRTG device ID for each hostname
+      vars:
+        hostname: "{{ item }}"
+      ansible.builtin.uri:
+        url: "{{ prtg_api_url }}/table.json?content=devices&output=json&columns=device,host&id=0&username=api&passhash={{ prtg_api_token }}"
+        method: GET
+        return_content: yes
+      register: prtg_response
+      loop: "{{ hostnames }}"
+      changed_when: false
+
+    - name: Parse and store device IDs in inventory
+      set_fact:
+        inventory: "{{ inventory | combine({ 'all': { 'hosts': inventory['all']['hosts'] + [item] }, '_meta': { 'hostvars': inventory['_meta']['hostvars'] | combine({ item: { 'device_id': (prtg_response.json.devices | selectattr('host', 'equalto', item) | first).objid } }) } }) }}"
+      loop: "{{ hostnames }}"
+      when: prtg_response.json.devices is defined and (prtg_response.json.devices | selectattr('host', 'equalto', item) | list) | length > 0
+
+    - name: Save inventory to dynamic_inventory.yml
+      copy:
+        content: "{{ inventory | to_nice_yaml }}"
+        dest: inventories/dynamic_inventory.yml
