@@ -11,7 +11,7 @@ function Get-PRTGDevices {
     )
 
     # Build the API URL for devices query
-    $url = "$ApiUrl/table.json?content=devices&columns=device,host,objid&username=api&passhash=$ApiToken"
+    $url = "$ApiUrl/table.json?content=devices&columns=device,host,objid&apitoken=$ApiToken"
 
     # Send API request
     $response = Invoke-RestMethod -Uri $url -Method Get
