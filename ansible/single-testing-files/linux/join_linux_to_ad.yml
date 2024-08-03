@@ -26,9 +26,11 @@
 #  For production use, store secrets / accounts in a vault file to be referenced in the vars collection
 
 ---
-- name: Join Linux computer to Active Directory
+- name: Join Linux computer to Active Directory and apply logon banner
   hosts: all
   become: yes
+  vars_files:
+    - vars/logon_banner.yml
   vars_prompt:
     - name: "ad_admin_user"
       prompt: "Enter the AD administrator username"
@@ -73,6 +75,8 @@
         state: present
         update_cache: yes
       when: ansible_facts['ansible_distribution'] == "Ubuntu" or ansible_facts['ansible_distribution'] == "Debian"
+      vars:
+        ansible_become_pass: "{{ local_sudo_password }}"
 
     - name: Install required packages on RedHat-based systems
       yum:
@@ -96,6 +100,8 @@
         state: present
         update_cache: yes
       when: ansible_facts['ansible_distribution'] == "RedHat" or ansible_facts['ansible_distribution'] == "CentOS"
+      vars:
+        ansible_become_pass: "{{ local_sudo_password }}"
 
     - name: Configure krb5.conf
       blockinfile:
@@ -164,5 +170,19 @@
         validate: 'visudo -cf %s'
       become: true
       become_user: "{{ local_sudo_user }}"
+      vars:
+        ansible_become_pass: "{{ local_sudo_password }}"
+
+    - name: Apply custom logon banner
+      copy:
+        src: vars/logon_banner.txt
+        dest: /etc/issue
+      vars:
+        ansible_become_pass: "{{ local_sudo_password }}"
+
+    - name: Apply custom logon banner to issue.net
+      copy:
+        src: vars/logon_banner.txt
+        dest: /etc/issue.net
       vars:
         ansible_become_pass: "{{ local_sudo_password }}"
