@@ -1,0 +1,71 @@
+---
+- name: Query vCenter servers for virtual machine information
+  hosts: localhost
+  gather_facts: no
+  vars:
+    vcenter_servers:
+      - name: vcenter1
+        hostname: "vcenter1.example.com"
+        username: "administrator@vsphere.local"
+        password: "password1"
+      - name: vcenter2
+        hostname: "vcenter2.example.com"
+        username: "administrator@vsphere.local"
+        password: "password2"
+      - name: vcenter3
+        hostname: "vcenter3.example.com"
+        username: "administrator@vsphere.local"
+        password: "password3"
+      - name: vcenter4
+        hostname: "vcenter4.example.com"
+        username: "administrator@vsphere.local"
+        password: "password4"
+  tasks:
+    - name: Gather VM information from each vCenter server
+      community.vmware.vmware_vm_info:
+        hostname: "{{ item.hostname }}"
+        username: "{{ item.username }}"
+        password: "{{ item.password }}"
+        validate_certs: no
+      register: vm_info
+      loop: "{{ vcenter_servers }}"
+      loop_control:
+        loop_var: vcenter
+
+    - name: Initialize VM lists
+      set_fact:
+        running_vms: []
+        stopped_vms: []
+
+    - name: Process VM information
+      set_fact:
+        running_vms: "{{ running_vms + [item] }}"
+        stopped_vms: "{{ stopped_vms + [item] }}"
+      loop: "{{ vm_info.results | map(attribute='vms') | list | flatten }}"
+      loop_control:
+        loop_var: vm
+      when: vm.power_state == 'poweredOn'
+      vars:
+        vm_data: >
+          {
+            "name": "{{ vm.name }}",
+            "ip_address": "{{ vm.guest_ip_address | default('N/A') }}",
+            "vmware_tools_installed": "{{ vm.guest_tools_installed | bool }}",
+            "esx_host": "{{ vm.esxi_hostname }}",
+            "datastores": "{{ vm.datastore | join(', ') }}"
+          }
+    
+    - name: Append to stopped VMs if poweredOff
+      set_fact:
+        stopped_vms: "{{ stopped_vms + [vm_data] }}"
+      when: vm.power_state == 'poweredOff'
+
+    - name: Output VM lists to JSON file
+      copy:
+        content: >
+          {
+            "running_vms": {{ running_vms | to_nice_json }},
+            "stopped_vms": {{ stopped_vms | to_nice_json }}
+          }
+        dest: "/path/to/output/vms.json"
+      run_once: true
