@@ -1,0 +1,168 @@
+---
+
+# Joins a Linux computer to an Active Directory,
+# places it in the "production_servers" OU, enables AD login capability
+# by installing necessary dependencies for LDAPS capability, 
+# and adds the "domain admins" AD group to the sudoers
+
+# The playbook uses the appropriate package manager based on the
+# Linux distribution being targeted.
+
+# Explanation:
+#  Prompt for AD Credentials and Local Sudo User: The playbook prompts the user for the Active Directory administrator username, password, the local sudo-capable account to use for the operation, and the password for the local sudo-capable account.
+#  Detect Operating System: Uses the setup module to gather facts about the operating system.
+#  Install Required Packages: Installs necessary packages for joining the domain and configuring SSSD for AD authentication, including LDAPS dependencies. It uses apt for Debian-based systems and yum for RedHat-based systems.
+#  Configure krb5.conf: Configures Kerberos by updating the /etc/krb5.conf file.
+#  Join the Domain: Uses the realm command to join the Linux computer to the specified Active Directory domain and OU, passing the AD administrator password.
+#  Check Join Status: Checks if the domain join was successful and fails if not.
+#  Configure SSSD: Configures SSSD for AD authentication by creating and updating the /etc/sssd/sssd.conf file.
+#  Restart SSSD Service: Restarts the SSSD service to apply the configuration.
+#  Allow Domain Users to Log In: Configures PAM to create home directories for AD users on their first login.
+#  Add AD Domain Admins to Sudoers: Adds the AD "domain admins" group to the sudoers file to grant them sudo privileges on the Linux computer. The task uses the specified local sudo-capable user and their password to ensure the changes are made with appropriate permissions.
+
+# Notes:
+#  Replace the placeholders in the playbook with actual values as needed.
+#  Ensure the necessary packages are installed and the system is configured for network connectivity to the AD domain controller.
+#  For production use, store secrets / accounts in a vault file to be referenced in the vars collection
+
+---
+- name: Join Linux computer to Active Directory
+  hosts: all
+  become: yes
+  vars_prompt:
+    - name: "ad_admin_user"
+      prompt: "Enter the AD administrator username"
+      private: no
+    - name: "ad_admin_password"
+      prompt: "Enter the AD administrator password"
+      private: yes
+    - name: "local_sudo_user"
+      prompt: "Enter the local account with sudo capability"
+      private: no
+    - name: "local_sudo_password"
+      prompt: "Enter the password for the local sudo account"
+      private: yes
+  vars:
+    ad_domain: "corp.company.com"
+    ad_ou: "OU=production_servers,DC=corp,DC=company,DC=com"
+    domain_admins_group: "domain admins"
+  tasks:
+    - name: Detect operating system
+      ansible.builtin.setup:
+        filter: ansible_distribution
+
+    - name: Install required packages on Debian-based systems
+      apt:
+        name:
+          - realmd
+          - sssd
+          - sssd-tools
+          - libnss-sss
+          - libpam-sss
+          - adcli
+          - samba-common
+          - oddjob
+          - oddjob-mkhomedir
+          - packagekit
+          - krb5-user
+          - krb5-config
+          - libpam-krb5
+          - libpam-winbind
+          - libnss-winbind
+          - winbind
+        state: present
+        update_cache: yes
+      when: ansible_facts['ansible_distribution'] == "Ubuntu" or ansible_facts['ansible_distribution'] == "Debian"
+
+    - name: Install required packages on RedHat-based systems
+      yum:
+        name:
+          - realmd
+          - sssd
+          - sssd-tools
+          - libnss-sss
+          - libpam-sss
+          - adcli
+          - samba-common
+          - oddjob
+          - oddjob-mkhomedir
+          - packagekit
+          - krb5-workstation
+          - krb5-libs
+          - libpam-krb5
+          - libpam-winbind
+          - libnss-winbind
+          - winbind
+        state: present
+        update_cache: yes
+      when: ansible_facts['ansible_distribution'] == "RedHat" or ansible_facts['ansible_distribution'] == "CentOS"
+
+    - name: Configure krb5.conf
+      blockinfile:
+        path: /etc/krb5.conf
+        block: |
+          [libdefaults]
+          default_realm = {{ ad_domain | upper }}
+          dns_lookup_realm = false
+          dns_lookup_kdc = true
+
+    - name: Join the domain
+      command: >
+        echo {{ ad_admin_password }} | realm join --user={{ ad_admin_user }} --computer-ou={{ ad_ou }} {{ ad_domain }}
+      register: realm_join
+      ignore_errors: yes
+
+    - name: Check realm join status
+      fail:
+        msg: "Failed to join the domain."
+      when: realm_join.failed
+
+    - name: Configure SSSD for AD authentication
+      blockinfile:
+        path: /etc/sssd/sssd.conf
+        create: yes
+        owner: root
+        group: root
+        mode: '0600'
+        block: |
+          [sssd]
+          domains = {{ ad_domain }}
+          config_file_version = 2
+          services = nss, pam
+
+          [domain/{{ ad_domain }}]
+          ad_domain = {{ ad_domain }}
+          krb5_realm = {{ ad_domain | upper }}
+          realmd_tags = manages-system joined-with-samba
+          cache_credentials = True
+          id_provider = ad
+          fallback_homedir = /home/%u@%d
+          default_shell = /bin/bash
+          ldap_id_mapping = True
+          use_fully_qualified_names = False
+          access_provider = ad
+
+    - name: Restart SSSD service
+      service:
+        name: sssd
+        state: restarted
+
+    - name: Allow domain users to log in
+      pamd:
+        name: common-session
+        type: session
+        control: required
+        module_path: pam_mkhomedir.so
+        module_arguments: skel=/etc/skel/ umask=0077
+
+    - name: Add AD domain admins to sudoers
+      lineinfile:
+        path: /etc/sudoers
+        state: present
+        regexp: '^%{{ domain_admins_group }}'
+        line: "%{{ domain_admins_group }} ALL=(ALL) ALL"
+        validate: 'visudo -cf %s'
+      become: true
+      become_user: "{{ local_sudo_user }}"
+      vars:
+        ansible_become_pass: "{{ local_sudo_password }}"
