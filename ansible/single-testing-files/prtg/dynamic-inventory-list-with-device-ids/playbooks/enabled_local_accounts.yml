@@ -1,0 +1,132 @@
+---
+- name: Query AD and check Windows servers
+  hosts: localhost
+  gather_facts: false
+  vars_prompt:
+    - name: "winrm_user"
+      prompt: "Enter the WinRM username"
+      private: false
+    - name: "winrm_password"
+      prompt: "Enter the WinRM password"
+      private: true
+  vars:
+    ad_ou: "OU=Servers,DC=corp,DC=company,DC=com"
+    domain: "corp.company.com"
+    network_share: "\\\\networkshare\\path\\output.json"
+    winrm_port: 5986
+    winrm_transport: "ntlm"
+  tasks:
+    - name: Query Active Directory for Windows Server computer objects
+      command: >
+        Get-ADComputer -SearchBase "{{ ad_ou }}" -Filter {operatingsystem -like '*Windows Server*'} | Select-Object -ExpandProperty Name
+      register: ad_computers
+      delegate_to: localhost
+      become: true
+      become_method: runas
+      become_user: "{{ ansible_user }}"
+      environment:
+        ANSIBLE_WINRM_KERBEROS_DELEGATION: "yes"
+
+    - name: Set fact for list of computers
+      set_fact:
+        computer_names: "{{ ad_computers.stdout_lines }}"
+
+    - name: Check if computers are online
+      win_ping:
+      register: ping_result
+      ignore_errors: true
+      vars:
+        ansible_user: "{{ winrm_user }}"
+        ansible_password: "{{ winrm_password }}"
+        ansible_port: "{{ winrm_port }}"
+        ansible_connection: winrm
+        ansible_winrm_transport: "{{ winrm_transport }}"
+        ansible_winrm_server_cert_validation: ignore
+      delegate_to: "{{ item }}.{{ domain }}"
+      loop: "{{ computer_names }}"
+
+    - name: Filter online computers
+      set_fact:
+        online_computers: "{{ ping_result.results | selectattr('ping', 'equalto', 'pong') | map(attribute='invocation.module_args._ansible_delegate_to') | list }}"
+
+    - name: Initialize the results lists
+      set_fact:
+        results: []
+        winrm_failed: []
+
+    - name: Test WinRM connection
+      win_command: hostname
+      register: winrm_test
+      ignore_errors: true
+      vars:
+        ansible_user: "{{ winrm_user }}"
+        ansible_password: "{{ winrm_password }}"
+        ansible_port: "{{ winrm_port }}"
+        ansible_connection: winrm
+        ansible_winrm_transport: "{{ winrm_transport }}"
+        ansible_winrm_server_cert_validation: ignore
+      delegate_to: "{{ item }}"
+      loop: "{{ online_computers }}"
+      loop_control:
+        loop_var: computer
+
+    - name: Filter WinRM successful computers
+      set_fact:
+        winrm_successful_computers: "{{ winrm_test.results | selectattr('failed', 'equalto', false) | map(attribute='invocation.module_args._ansible_delegate_to') | list }}"
+        winrm_failed_computers: "{{ winrm_test.results | selectattr('failed', 'equalto', true) | map(attribute='invocation.module_args._ansible_delegate_to') | list }}"
+
+    - name: Query local accounts on WinRM successful computers
+      win_command: |
+        Get-LocalUser | Where-Object { $_.Enabled -eq $true -and $_.Name -ne 'Administrator' } | Select-Object -Property Name | ConvertTo-Json
+      register: local_accounts
+      when: item in winrm_successful_computers
+      vars:
+        ansible_user: "{{ winrm_user }}"
+        ansible_password: "{{ winrm_password }}"
+        ansible_port: "{{ winrm_port }}"
+        ansible_connection: winrm
+        ansible_winrm_transport: "{{ winrm_transport }}"
+        ansible_winrm_server_cert_validation: ignore
+      delegate_to: "{{ item }}"
+      loop: "{{ winrm_successful_computers }}"
+      loop_control:
+        loop_var: computer
+
+    - name: Collect enabled local accounts and their groups
+      win_shell: |
+        $accounts = Get-LocalUser | Where-Object { $_.Enabled -eq $true -and $_.Name -ne 'Administrator' }
+        $output = @()
+        foreach ($account in $accounts) {
+          $groups = (Get-LocalGroupMember -Member $account.Name).Group | Select-Object -ExpandProperty Name
+          $output += [PSCustomObject]@{Name=$account.Name; Groups=$groups}
+        }
+        $output | ConvertTo-Json
+      register: account_details
+      when: local_accounts.stdout != "[]"
+      vars:
+        ansible_user: "{{ winrm_user }}"
+        ansible_password: "{{ winrm_password }}"
+        ansible_port: "{{ winrm_port }}"
+        ansible_connection: winrm
+        ansible_winrm_transport: "{{ winrm_transport }}"
+        ansible_winrm_server_cert_validation: ignore
+      delegate_to: "{{ item }}"
+      loop: "{{ winrm_successful_computers }}"
+      loop_control:
+        loop_var: computer
+
+    - name: Append results with valid data
+      set_fact:
+        results: "{{ results + [{'computer': item.computer, 'accounts': account_details.stdout | from_json }] }}"
+      when: account_details.stdout != "[]"
+      loop: "{{ account_details.results }}"
+
+    - name: Append WinRM failed computers to results
+      set_fact:
+        winrm_failed: "{{ winrm_failed + winrm_failed_computers }}"
+
+    - name: Write results to JSON file
+      copy:
+        content: "{{ {'computers': results, 'winrm_failed': winrm_failed} | to_nice_json }}"
+        dest: "{{ network_share }}"
+      run_once: true

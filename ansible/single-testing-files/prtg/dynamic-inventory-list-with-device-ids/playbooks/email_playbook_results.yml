@@ -1,0 +1,45 @@
+---
+- name: Gather results and send email
+  hosts: localhost
+  gather_facts: false
+
+  vars:
+    smtp_server: "smtp.example.com"
+    smtp_port: 587
+    smtp_username: "your_username@example.com"
+    smtp_password: "your_password"
+    email_to: "recipient@example.com"
+    email_from: "your_username@example.com"
+    email_subject: "Ansible Playbook Run Results"
+
+  tasks:
+    - name: Gather all previous playbook results
+      meta: get_vars
+      register: all_vars
+
+    - name: Extract playbook results
+      set_fact:
+        playbook_results: "{{ all_vars | json_query('[*].results') }}"
+
+    - name: Format email body
+      set_fact:
+        email_body: |
+          Playbook Results:
+          {% for result in playbook_results %}
+          - Host: {{ result.item }}
+            Status: {{ result.stat }}
+            Output:
+            {{ result.stdout }}
+          {% endfor %}
+
+    - name: Send email with playbook results
+      mail:
+        host: "{{ smtp_server }}"
+        port: "{{ smtp_port }}"
+        username: "{{ smtp_username }}"
+        password: "{{ smtp_password }}"
+        to: "{{ email_to }}"
+        from: "{{ email_from }}"
+        subject: "{{ email_subject }}"
+        body: "{{ email_body }}"
+        secure: starttls

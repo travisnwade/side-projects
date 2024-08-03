@@ -1,0 +1,43 @@
+---
+- name: Generate Inventory from Active Directory OU
+  hosts: localhost
+  gather_facts: false
+  vars:
+    ad_ou: "OU=Computers,DC=corp,DC=company,DC=com"
+    domain: "corp.company.com"
+    inventory_file: "/path/to/generated_inventory.ini"
+  tasks:
+    - name: Query Active Directory for computer objects
+      command: >
+        Get-ADComputer -SearchBase "{{ ad_ou }}" -Filter *
+        | Select-Object -ExpandProperty Name
+      register: ad_computers
+      delegate_to: localhost
+      become: true
+      become_method: runas
+      become_user: "{{ ansible_user }}"
+      environment:
+        ANSIBLE_WINRM_KERBEROS_DELEGATION: "yes"
+
+    - name: Set fact for list of computers
+      set_fact:
+        computer_names: "{{ ad_computers.stdout_lines }}"
+
+    - name: Initialize inventory file
+      copy:
+        content: "[windows]\n"
+        dest: "{{ inventory_file }}"
+
+    - name: Check if computers are online
+      win_ping:
+      register: ping_result
+      ignore_errors: true
+      delegate_to: "{{ item }}.{{ domain }}"
+      loop: "{{ computer_names }}"
+
+    - name: Add responsive computers to inventory
+      lineinfile:
+        path: "{{ inventory_file }}"
+        line: "{{ item.invocation.module_args._ansible_delegate_to }}"
+      when: ping_result is success
+      loop: "{{ ping_result.results }}"
