@@ -1,0 +1,103 @@
+---
+
+# Updates currently installed packages on a Linux computer,
+# checks for available kernel updates (but does not install them),
+# and lists available kernel updates along with the current kernel
+# version and the updated packages at the end of the playbook run.
+# The playbook uses the appropriate package manager based on the
+# targeted Linux distribution and prompts the user for a user
+# account authenticated with the sudoers file on the target system.
+
+# Explanation:
+#  Prompt for Local Sudo User Credentials: The playbook prompts the user for the local sudo-capable account and password.
+#  Detect Operating System: Uses the setup module to gather facts about the operating system.
+#  Update Packages: Updates all installed packages to their latest versions using apt for Debian-based systems and yum for RedHat-based systems.
+#  List Installed Packages: Lists all installed packages and their versions using apt for Debian-based systems and yum for RedHat-based systems, registering the output to installed_packages.
+#  Check for Kernel Updates: Runs the appropriate command to check for available kernel updates on Debian-based systems (apt list --upgradable | grep -i linux-image) and RedHat-based systems (yum list updates | grep -i kernel). It registers the output to kernel_updates.
+#  Get Current Kernel Version: Uses the uname -r command to get the current kernel version and registers the output to current_kernel.
+#  List Available Kernel Updates: Uses the debug module to display the current kernel version and any available kernel updates.
+#  List Updated Packages: Uses the debug module to display the list of installed packages and their versions after the update.
+
+# Notes:
+#  Ensure that the package update commands and options are appropriate for your environment.
+#  This playbook assumes that the target systems use either apt or yum as package managers. Modify the tasks if other package managers are used.
+#  Adjust the list of packages to update as needed.
+
+- name: Update installed packages and check for kernel updates
+  hosts: all
+  become: yes
+  vars_prompt:
+    - name: "local_sudo_user"
+      prompt: "Enter the local account with sudo capability"
+      private: no
+    - name: "local_sudo_password"
+      prompt: "Enter the password for the local sudo account"
+      private: yes
+  tasks:
+    - name: Detect operating system
+      ansible.builtin.setup:
+        filter: ansible_distribution
+
+    - name: Update packages on Debian-based systems
+      apt:
+        upgrade: dist
+        update_cache: yes
+        cache_valid_time: 3600
+      when: ansible_facts['ansible_distribution'] == "Ubuntu" or ansible_facts['ansible_distribution'] == "Debian"
+      vars:
+        ansible_become_pass: "{{ local_sudo_password }}"
+
+    - name: Update packages on RedHat-based systems
+      yum:
+        name: '*'
+        state: latest
+      when: ansible_facts['ansible_distribution'] == "RedHat" or ansible_facts['ansible_distribution'] == "CentOS"
+      vars:
+        ansible_become_pass: "{{ local_sudo_password }}"
+
+    - name: List installed packages on Debian-based systems
+      command: apt list --installed
+      register: installed_packages
+      when: ansible_facts['ansible_distribution'] == "Ubuntu" or ansible_facts['ansible_distribution'] == "Debian"
+      vars:
+        ansible_become_pass: "{{ local_sudo_password }}"
+
+    - name: List installed packages on RedHat-based systems
+      command: yum list installed
+      register: installed_packages
+      when: ansible_facts['ansible_distribution'] == "RedHat" or ansible_facts['ansible_distribution'] == "CentOS"
+      vars:
+        ansible_become_pass: "{{ local_sudo_password }}"
+
+    - name: Check for available kernel updates on Debian-based systems
+      command: apt list --upgradable | grep -i linux-image
+      register: kernel_updates
+      when: ansible_facts['ansible_distribution'] == "Ubuntu" or ansible_facts['ansible_distribution'] == "Debian"
+      vars:
+        ansible_become_pass: "{{ local_sudo_password }}"
+      ignore_errors: yes
+
+    - name: Check for available kernel updates on RedHat-based systems
+      command: yum list updates | grep -i kernel
+      register: kernel_updates
+      when: ansible_facts['ansible_distribution'] == "RedHat" or ansible_facts['ansible_distribution'] == "CentOS"
+      vars:
+        ansible_become_pass: "{{ local_sudo_password }}"
+      ignore_errors: yes
+
+    - name: Get current kernel version
+      command: uname -r
+      register: current_kernel
+
+    - name: List current kernel version and available kernel updates
+      debug:
+        msg: |
+          Current kernel version: {{ current_kernel.stdout }}
+          Available kernel updates:
+          {{ kernel_updates.stdout_lines | join('\n') }}
+
+    - name: List updated packages
+      debug:
+        msg: |
+          Installed packages:
+          {{ installed_packages.stdout_lines | join('\n') }}
