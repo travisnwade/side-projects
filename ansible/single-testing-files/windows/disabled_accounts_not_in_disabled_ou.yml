@@ -1,0 +1,61 @@
+---
+
+# 1. **Prompt for Credentials**:
+#     - The playbook prompts the user to enter `winrm_user` and `winrm_password` for authentication with Active Directory.
+
+# 2. **Query Active Directory**:
+#     - The playbook uses the `Get-ADUser` PowerShell command to find all disabled user accounts, excluding those in the "disabled_accounts" OU. 
+#     - The results include the user's name and the OU in which the account is located.
+
+# 3. **Output Results to JSON File**:
+#     - The output is saved in JSON format to a specified network share.
+#     - The file name includes the date and time to ensure uniqueness and traceability.
+
+# 4. **Variables**:
+#     - `network_share`: The path to the NTFS network share where the JSON file will be saved.
+#     - `output_file_prefix`: A prefix for the output file name, which includes the phrase "disabled_ad_accounts_not_in_disabled_ou".
+#     - `current_date`: The current date and time, used to create a unique output file name.
+
+# 5. **How to Run**:
+#     - Update the playbook with the correct network share path.
+#     - Execute the playbook using the `ansible-playbook` command, and provide the necessary credentials when prompted.
+
+# This playbook ensures that you can efficiently manage and monitor disabled user accounts in your Active Directory,
+# excluding those already placed in a designated "disabled_accounts" OU.
+
+
+- name: Query AD for disabled user accounts not in "disabled_accounts" OU
+  hosts: localhost
+  gather_facts: no
+  vars_prompt:
+    - name: "winrm_user"
+      prompt: "Enter the WinRM username"
+      private: no
+    - name: "winrm_password"
+      prompt: "Enter the WinRM password"
+      private: yes
+  vars:
+    network_share: "\\\\networkshare\\path"
+    output_file_prefix: "disabled_ad_accounts_not_in_disabled_ou"
+    current_date: "{{ lookup('pipe', 'date +%Y-%m-%d_%H-%M-%S') }}"
+  tasks:
+    - name: Query Active Directory for disabled user accounts not in "disabled_accounts" OU
+      command: >
+        Get-ADUser -Filter {Enabled -eq $False -and DistinguishedName -notlike "*OU=disabled_accounts,*"} -Properties DistinguishedName |
+        Select-Object Name, DistinguishedName |
+        ConvertTo-Json -Compress
+      register: disabled_users
+      delegate_to: localhost
+      become: yes
+      become_method: runas
+      become_user: "{{ ansible_user }}"
+      environment:
+        ANSIBLE_WINRM_KERBEROS_DELEGATION: "yes"
+        USER: "{{ winrm_user }}"
+        PASS: "{{ winrm_password }}"
+
+    - name: Write results to JSON file
+      copy:
+        content: "{{ disabled_users.stdout }}"
+        dest: "{{ network_share }}\\{{ output_file_prefix }}_{{ current_date }}.json"
+      run_once: true
