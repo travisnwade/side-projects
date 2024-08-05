@@ -1,11 +1,11 @@
-AWSTemplateFormatVersion: '2010-09-09'
+AWSTemplateFormatVersion: "2010-09-09"
 Description: >
-  AWS CloudFormation Template to create a VPC with one public subnet and two private subnets with a NAT Gateway, and deploy three Windows servers with specific security groups.
+  AWS CloudFormation Template to create a VPC with one public subnet and two private subnets with a NAT Gateway, and deploy three servers with specific security groups.
 
 Resources:
   VPC:
     Type: AWS::EC2::VPC
-    Properties: 
+    Properties:
       CidrBlock: 10.0.0.0/16
       EnableDnsSupport: true
       EnableDnsHostnames: true
@@ -35,7 +35,7 @@ Resources:
       VpcId: !Ref VPC
       CidrBlock: 10.0.1.0/24
       MapPublicIpOnLaunch: true
-      AvailabilityZone: !Select [ 0, !GetAZs '' ]
+      AvailabilityZone: !Select [0, !GetAZs '']
       Tags:
         - Key: Name
           Value: public-subnet1
@@ -46,7 +46,7 @@ Resources:
     Properties:
       VpcId: !Ref VPC
       CidrBlock: 10.0.2.0/24
-      AvailabilityZone: !Select [ 0, !GetAZs '' ]
+      AvailabilityZone: !Select [0, !GetAZs '']
       Tags:
         - Key: Name
           Value: private-subnet1
@@ -57,7 +57,7 @@ Resources:
     Properties:
       VpcId: !Ref VPC
       CidrBlock: 10.0.3.0/24
-      AvailabilityZone: !Select [ 1, !GetAZs '' ]
+      AvailabilityZone: !Select [1, !GetAZs '']
       Tags:
         - Key: Name
           Value: private-subnet2
@@ -172,42 +172,94 @@ Resources:
           Value: public-instance-sg
     DeletionPolicy: Delete
 
+  InternalSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: InternalSG
+      GroupDescription: Allow all traffic within the VPC
+      VpcId: !Ref VPC
+      SecurityGroupIngress:
+        - IpProtocol: -1
+          FromPort: -1
+          ToPort: -1
+          CidrIp: 10.0.0.0/16
+      Tags:
+        - Key: Name
+          Value: internal-sg
+    DeletionPolicy: Delete
+
   PublicInstance:
     Type: AWS::EC2::Instance
     Properties:
       InstanceType: t2.micro
-      ImageId: ami-07d9456e59793a7d5
+      ImageId: ami-03f5152d831db85a0
       SubnetId: !Ref PublicSubnet
-      KeyName: lab-key-pair
+      KeyName: lab-use2-key-pair
       SecurityGroupIds:
         - !Ref PublicSecurityGroup
+        - !Ref InternalSecurityGroup
+      UserData:
+        Fn::Base64: !Sub |
+          <powershell>
+          Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
+          Install-Module -Name AWS.Tools.Installer -Force
+          Install-AWSToolsModule AWS.Tools.S3 -Force
+          Install-Module -Name AWSPowerShell -Force -AllowClobber
+          Invoke-WebRequest -Uri https://s3.amazonaws.com/amazon-ssm-us-east-1/latest/windows_amd64/AmazonSSMAgentSetup.exe -OutFile $env:USERPROFILE\Desktop\SSMAgent_setup.exe
+          Start-Process -FilePath $env:USERPROFILE\Desktop\SSMAgent_setup.exe -ArgumentList '/S' -NoNewWindow -Wait
+          Restart-Computer -Force
+          </powershell>
       Tags:
         - Key: Name
-          Value: public-instance
+          Value: public-jump-host
     DeletionPolicy: Delete
 
   PrivateInstance1:
     Type: AWS::EC2::Instance
     Properties:
       InstanceType: t2.micro
-      ImageId: ami-07d9456e59793a7d5
+      ImageId: ami-03f5152d831db85a0
       SubnetId: !Ref PrivateSubnet1
-      KeyName: lab-key-pair
+      KeyName: lab-use2-key-pair
+      SecurityGroupIds:
+        - !Ref InternalSecurityGroup
+      UserData:
+        Fn::Base64: !Sub |
+          <powershell>
+          Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
+          Install-Module -Name AWS.Tools.Installer -Force
+          Install-AWSToolsModule AWS.Tools.S3 -Force
+          Install-Module -Name AWSPowerShell -Force -AllowClobber
+          Invoke-WebRequest -Uri https://s3.amazonaws.com/amazon-ssm-us-east-1/latest/windows_amd64/AmazonSSMAgentSetup.exe -OutFile $env:USERPROFILE\Desktop\SSMAgent_setup.exe
+          Start-Process -FilePath $env:USERPROFILE\Desktop\SSMAgent_setup.exe -ArgumentList '/S' -NoNewWindow -Wait
+          Restart-Computer -Force
+          </powershell>
       Tags:
         - Key: Name
-          Value: private-instance-1
+          Value: private-windows-1
     DeletionPolicy: Delete
 
   PrivateInstance2:
     Type: AWS::EC2::Instance
     Properties:
       InstanceType: t2.micro
-      ImageId: ami-0a0e5d9c7acc336f1
+      ImageId: ami-003932de22c285676
       SubnetId: !Ref PrivateSubnet2
-      KeyName: lab-key-pair
+      KeyName: lab-use2-key-pair
+      SecurityGroupIds:
+        - !Ref InternalSecurityGroup
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash
+          apt-get update -y
+          apt-get install -y amazon-ssm-agent
+          apt-get install -y aws-cli
+          systemctl enable amazon-ssm-agent
+          systemctl start amazon-ssm-agent
+          reboot
       Tags:
         - Key: Name
-          Value: private-instance-2
+          Value: private-ubuntu-1
     DeletionPolicy: Delete
 
 Outputs:
