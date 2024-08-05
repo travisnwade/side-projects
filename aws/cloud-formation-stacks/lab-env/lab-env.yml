@@ -156,16 +156,12 @@ Resources:
     Type: AWS::EC2::SecurityGroup
     Properties:
       GroupName: PublicInstanceSG
-      GroupDescription: Enable SSH and RDP access from a specific IP
+      GroupDescription: Enable SSH access from a specific IP
       VpcId: !Ref VPC
       SecurityGroupIngress:
         - IpProtocol: tcp
           FromPort: 22
           ToPort: 22
-          CidrIp: 73.234.7.17/32
-        - IpProtocol: tcp
-          FromPort: 3389
-          ToPort: 3389
           CidrIp: 73.234.7.17/32
       Tags:
         - Key: Name
@@ -192,7 +188,7 @@ Resources:
     Type: AWS::EC2::Instance
     Properties:
       InstanceType: t2.micro
-      ImageId: ami-03f5152d831db85a0
+      ImageId: ami-0862be96e41dcbf74
       SubnetId: !Ref PublicSubnet
       KeyName: lab-use2-key-pair
       SecurityGroupIds:
@@ -200,43 +196,39 @@ Resources:
         - !Ref InternalSecurityGroup
       UserData:
         Fn::Base64: !Sub |
-          <powershell>
-          Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
-          Install-Module -Name AWS.Tools.Installer -Force
-          Install-AWSToolsModule AWS.Tools.S3 -Force
-          Install-Module -Name AWSPowerShell -Force -AllowClobber
-          Invoke-WebRequest -Uri https://s3.amazonaws.com/amazon-ssm-us-east-1/latest/windows_amd64/AmazonSSMAgentSetup.exe -OutFile $env:USERPROFILE\Desktop\SSMAgent_setup.exe
-          Start-Process -FilePath $env:USERPROFILE\Desktop\SSMAgent_setup.exe -ArgumentList '/S' -NoNewWindow -Wait
-          Restart-Computer -Force
-          </powershell>
+          #!/bin/bash
+          apt-get update -y
+          apt-get install -y amazon-ssm-agent
+          apt-get install -y aws-cli
+          systemctl enable amazon-ssm-agent
+          systemctl start amazon-ssm-agent
+          reboot
       Tags:
         - Key: Name
-          Value: public-jump-host
+          Value: public-ubuntu-jump-host
     DeletionPolicy: Delete
 
   PrivateInstance1:
     Type: AWS::EC2::Instance
     Properties:
       InstanceType: t2.micro
-      ImageId: ami-03f5152d831db85a0
+      ImageId: ami-0862be96e41dcbf74
       SubnetId: !Ref PrivateSubnet1
       KeyName: lab-use2-key-pair
       SecurityGroupIds:
         - !Ref InternalSecurityGroup
       UserData:
         Fn::Base64: !Sub |
-          <powershell>
-          Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
-          Install-Module -Name AWS.Tools.Installer -Force
-          Install-AWSToolsModule AWS.Tools.S3 -Force
-          Install-Module -Name AWSPowerShell -Force -AllowClobber
-          Invoke-WebRequest -Uri https://s3.amazonaws.com/amazon-ssm-us-east-1/latest/windows_amd64/AmazonSSMAgentSetup.exe -OutFile $env:USERPROFILE\Desktop\SSMAgent_setup.exe
-          Start-Process -FilePath $env:USERPROFILE\Desktop\SSMAgent_setup.exe -ArgumentList '/S' -NoNewWindow -Wait
-          Restart-Computer -Force
-          </powershell>
+          #!/bin/bash
+          apt-get update -y
+          apt-get install -y amazon-ssm-agent
+          apt-get install -y aws-cli
+          systemctl enable amazon-ssm-agent
+          systemctl start amazon-ssm-agent
+          reboot
       Tags:
         - Key: Name
-          Value: private-windows-1
+          Value: private-ubuntu-1
     DeletionPolicy: Delete
 
   PrivateInstance2:
@@ -259,7 +251,7 @@ Resources:
           reboot
       Tags:
         - Key: Name
-          Value: private-ubuntu-1
+          Value: private-ubuntu-2
     DeletionPolicy: Delete
 
   SSMIAMRole:
