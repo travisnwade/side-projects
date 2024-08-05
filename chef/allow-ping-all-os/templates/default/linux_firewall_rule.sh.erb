@@ -1,0 +1,18 @@
+#!/bin/bash
+
+# Allow ICMP (Ping) through iptables
+iptables -A INPUT -p icmp --icmp-type echo-request -j ACCEPT
+service iptables save
+
+# For systems using firewalld
+if command -v firewall-cmd >/dev/null 2>&1; then
+  firewall-cmd --permanent --add-icmp-block=echo-reply
+  firewall-cmd --permanent --add-icmp-block=echo-request
+  firewall-cmd --reload
+fi
+
+# For systems using ufw
+if command -v ufw >/dev/null 2>&1; then
+  ufw allow proto icmp
+  ufw reload
+fi
