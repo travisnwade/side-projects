@@ -243,7 +243,7 @@ Resources:
     Type: AWS::EC2::Instance
     Properties:
       InstanceType: t2.micro
-      ImageId: ami-003932de22c285676
+      ImageId: ami-0862be96e41dcbf74
       SubnetId: !Ref PrivateSubnet2
       KeyName: lab-use2-key-pair
       SecurityGroupIds:
