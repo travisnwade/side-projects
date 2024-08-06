@@ -3,26 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Random Duck Background</title>
+    <title>Duck Follower</title>
     <link rel="stylesheet" href="styles.css">
 
     <!-- SEO Meta Tags -->
-    <meta name="description" content="A simple web page that displays a full-screen random duck image as the background.">
-    <meta name="keywords" content="random duck, duck images, random background, full-screen background, duck API">
-    <meta name="author" content="Your Name">
+    <meta name="description" content="A little ducky that follows you.">
+    <meta name="author" content="Travis Wade">
     <link rel="canonical" href="https://duck.twade.io/">
 
     <!-- Open Graph Meta Tags for Social Sharing -->
-    <meta property="og:title" content="Random Duck Background">
-    <meta property="og:description" content="Check out this web page that displays a full-screen random duck image as the background!">
+    <meta property="og:title" content="Duck Follower">
+    <meta property="og:description" content="A little ducky that follows you.">
     <meta property="og:image" content="https://duck.twade.io/assets/duck.webp">
     <meta property="og:url" content="https://duck.twade.io/">
     <meta property="og:type" content="website">
     
     <!-- Twitter Card Meta Tags -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Random Duck Background">
-    <meta name="twitter:description" content="Check out this web page that displays a full-screen random duck image as the background!">
+    <meta name="twitter:title" content="Duck Follower">
+    <meta name="twitter:description" content="A little ducky that follows you.">
     <meta name="twitter:image" content="https://duck.twade.io/assets/duck.webp">
     
     <!-- Favicon -->
@@ -30,20 +29,34 @@
 
 </head>
 <body>
+    <div class="cursor-duck" id="cursorDuck"></div>
+    <div class="mini-duck" id="miniDuck1"></div>
+    <div class="mini-duck" id="miniDuck2"></div>
+    <div class="mini-duck" id="miniDuck3"></div>
+    <div class="mini-duck" id="miniDuck4"></div>
+    <div class="mini-duck" id="miniDuck5"></div>
+
     <script>
-        async function setBackground() {
-            try {
-                const response = await fetch('https://random-d.uk/api/v2/random', { mode: 'no-cors' });
-                const data = await response.json();
-                const imageUrl = data.url;
+        const cursorDuck = document.getElementById('cursorDuck');
+        const miniDucks = [
+            document.getElementById('miniDuck1'),
+            document.getElementById('miniDuck2'),
+            document.getElementById('miniDuck3'),
+            document.getElementById('miniDuck4'),
+            document.getElementById('miniDuck5')
+        ];
 
-                document.body.innerHTML += `<div class="background-image" style="background-image: url('${imageUrl}');"></div>`;
-            } catch (error) {
-                console.error('Error fetching random duck image:', error);
-            }
-        }
+        document.addEventListener('mousemove', (e) => {
+            cursorDuck.style.left = `${e.pageX}px`;
+            cursorDuck.style.top = `${e.pageY}px`;
 
-        setBackground();
+            miniDucks.forEach((duck, index) => {
+                setTimeout(() => {
+                    duck.style.left = `${e.pageX + (index + 1) * 20}px`;
+                    duck.style.top = `${e.pageY + (index + 1) * 20}px`;
+                }, index * 100);
+            });
+        });
     </script>
 </body>
 </html>

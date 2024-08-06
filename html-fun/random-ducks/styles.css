@@ -4,18 +4,21 @@ body, html {
     width: 100%;
     height: 100%;
     overflow: hidden;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    background-color: black;
+    cursor: none;  /* Hide the default cursor */
 }
 
-.background-image {
+.cursor-duck, .mini-duck {
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    width: 32px;
+    height: 32px;
+    background-image: url('https://random-d.uk/api/v2/randomimg');
     background-size: cover;
-    background-position: center;
-    z-index: -1;
+    pointer-events: none;  /* Make sure the ducks don't capture mouse events */
+}
+
+.mini-duck {
+    width: 20px;
+    height: 20px;
+    opacity: 0.8;
 }
