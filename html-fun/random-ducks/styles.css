@@ -15,8 +15,8 @@ body {
 }
 
 .duck-icon {
-    width: 80px;
-    height: 80px;
+    width: 60px;
+    height: 60px;
     animation: float 2s ease-in-out infinite;
 }
 
