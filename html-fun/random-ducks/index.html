@@ -51,6 +51,7 @@
         const counter = document.getElementById('counter');
         const confetti = document.getElementById('confetti');
         let eggCount = 0;
+        let mouseTimeout;
 
         document.addEventListener('mousemove', (e) => {
             cursorDuck.style.left = `${e.pageX}px`;
@@ -62,6 +63,18 @@
                     duck.style.top = `${e.pageY + (index + 1) * 60}px`;
                 }, index * 100);
             });
+
+            clearTimeout(mouseTimeout);
+            mouseTimeout = setTimeout(() => {
+                miniDucks.forEach((duck) => {
+                    const randomX = Math.random() * 100 - 50; // Random movement within 50px
+                    const randomY = Math.random() * 100 - 50;
+                    const currentX = parseFloat(duck.style.left);
+                    const currentY = parseFloat(duck.style.top);
+                    duck.style.left = `${currentX + randomX}px`;
+                    duck.style.top = `${currentY + randomY}px`;
+                });
+            }, 3000);
         });
 
         function placeEgg() {
