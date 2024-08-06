@@ -15,14 +15,15 @@ body {
     text-align: center;
     text-decoration: none;
     display: inline-block;
-    font-size: 16px;
+    font-size: 25px;
     margin: 4px 2px;
     cursor: pointer;
     border-radius: 12px;
     transition: background-color 0.3s ease;
     font-family: 'Shadows Into Light', cursive;
+    font-weight: bold;
 }
 
 .button:hover {
-    background-color: #45a049;
+    background-color: #d1d100;
 }
