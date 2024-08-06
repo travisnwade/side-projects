@@ -51,31 +51,19 @@
         let mouseTimeout;
         let wanderingInterval;
 
-        // Debounced function to handle mouse movement
-        const debounce = (func, wait) => {
-            let timeout;
-            return function(...args) {
-                const context = this;
-                clearTimeout(timeout);
-                timeout = setTimeout(() => func.apply(context, args), wait);
-            };
-        };
-
-        const handleMouseMove = debounce((e) => {
+        const handleMouseMove = (e) => {
             cursorDuck.style.left = `${e.pageX}px`;
             cursorDuck.style.top = `${e.pageY}px`;
 
             miniDucks.forEach((duck, index) => {
-                setTimeout(() => {
-                    duck.style.left = `${e.pageX + (index + 1) * 30}px`;
-                    duck.style.top = `${e.pageY + (index + 1) * 30}px`;
-                }, index * 100);
+                duck.style.left = `${e.pageX + (index + 1) * 30}px`;
+                duck.style.top = `${e.pageY + (index + 1) * 30}px`;
             });
 
             clearTimeout(mouseTimeout);
             clearInterval(wanderingInterval);
             mouseTimeout = setTimeout(startWandering, 3000);
-        }, 10);
+        };
 
         document.addEventListener('mousemove', handleMouseMove);
 
