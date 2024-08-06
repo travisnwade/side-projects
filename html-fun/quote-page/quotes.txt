@@ -1,5 +1,100 @@
-"Life is what happens when you're busy making other plans." - John Lennon
-"The purpose of our lives is to be happy." - Dalai Lama
-"Get busy living or get busy dying." - Stephen King
-"You have within you right now, everything you need to deal with whatever the world can throw at you." - Brian Tracy
-"Believe you can and you're halfway there." - Theodore Roosevelt
+The unexamined life is not worth living. - Socrates
+I think, therefore I am. - René Descartes
+The only thing I know is that I know nothing. - Socrates
+Happiness is the highest good. - Aristotle
+To be is to be perceived. - George Berkeley
+One cannot step twice in the same river. - Heraclitus
+Man is condemned to be free. - Jean-Paul Sartre
+God is dead. - Friedrich Nietzsche
+The will to power. - Friedrich Nietzsche
+The greatest happiness of the greatest number is the foundation of morals and legislation. - Jeremy Bentham
+Knowledge is power. - Francis Bacon
+Liberty consists in doing what one desires. - John Stuart Mill
+The life of man is solitary, poor, nasty, brutish, and short. - Thomas Hobbes
+Hell is other people. - Jean-Paul Sartre
+Existence precedes essence. - Jean-Paul Sartre
+That which does not kill us makes us stronger. - Friedrich Nietzsche
+Cogito, ergo sum. - René Descartes
+He who thinks great thoughts, often makes great errors. - Martin Heidegger
+To be is to do. - Immanuel Kant
+To do is to be. - Jean-Paul Sartre
+The end justifies the means. - Niccolò Machiavelli
+Without music, life would be a mistake. - Friedrich Nietzsche
+Happiness depends upon ourselves. - Aristotle
+He who has a why to live can bear almost any how. - Friedrich Nietzsche
+We are what we repeatedly do. Excellence, then, is not an act, but a habit. - Aristotle
+It is not enough to have a good mind; the main thing is to use it well. - René Descartes
+Act only according to that maxim whereby you can at the same time will that it should become a universal law. - Immanuel Kant
+The mind is furnished with ideas by experience alone. - John Locke
+The function of prayer is not to influence God, but rather to change the nature of the one who prays. - Søren Kierkegaard
+Freedom is secured not by the fulfilling of one's desires, but by the removal of desire. - Epictetus
+No man's knowledge here can go beyond his experience. - John Locke
+If God did not exist, it would be necessary to invent Him. - Voltaire
+The unexamined life is not worth living for a human being. - Socrates
+Entities should not be multiplied unnecessarily. - William of Ockham
+There is only one good, knowledge, and one evil, ignorance. - Socrates
+The brave man is he who overcomes not only his enemies but his pleasures. - Democritus
+War is nothing but a continuation of politics with the admixture of other means. - Carl von Clausewitz
+Man is the measure of all things. - Protagoras
+Everything has been figured out, except how to live. - Jean-Paul Sartre
+I would never die for my beliefs because I might be wrong. - Bertrand Russell
+Life must be understood backward. But it must be lived forward. - Søren Kierkegaard
+Metaphysics is a dark ocean without shores or lighthouse, strewn with many a philosophic wreck. - Immanuel Kant
+There is but one truly serious philosophical problem and that is suicide. - Albert Camus
+Science is what you know. Philosophy is what you don't know. - Bertrand Russell
+We live in the best of all possible worlds. - Gottfried Wilhelm Leibniz
+He who thinks great thoughts, often makes great errors. - Martin Heidegger
+The price of greatness is responsibility. - Winston Churchill
+An unexamined life is not worth living. - Socrates
+He who knows, does not speak. He who speaks, does not know. - Lao Tzu
+Only one man ever understood me, and he didn't understand me. - G.W.F. Hegel
+Whereof one cannot speak, thereof one must be silent. - Ludwig Wittgenstein
+Religion is the opium of the masses. - Karl Marx
+I can control my passions and emotions if I can understand their nature. - Baruch Spinoza
+It is one thing to show a man that he is in error, and another to put him in possession of the truth. - John Locke
+Philosophy is a battle against the bewitchment of our intelligence by means of language. - Ludwig Wittgenstein
+The greater the difficulty, the more glory in surmounting it. - Epicurus
+All is for the best, in the best of all possible worlds. - Voltaire
+Man is born free, and everywhere he is in chains. - Jean-Jacques Rousseau
+That man is wisest who, like Socrates, realizes that his wisdom is worthless. - Plato
+The only thing I know is that I know nothing. - Socrates
+The mind is furnished with ideas by experience alone. - John Locke
+Act only according to that maxim whereby you can at the same time will that it should become a universal law. - Immanuel Kant
+The greater the difficulty, the more glory in surmounting it. - Epicurus
+We live in the best of all possible worlds. - Gottfried Wilhelm Leibniz
+Metaphysics is a dark ocean without shores or lighthouse, strewn with many a philosophic wreck. - Immanuel Kant
+Science is what you know. Philosophy is what you don't know. - Bertrand Russell
+There is but one truly serious philosophical problem and that is suicide. - Albert Camus
+Man is the measure of all things. - Protagoras
+The function of prayer is not to influence God, but rather to change the nature of the one who prays. - Søren Kierkegaard
+Life must be understood backward. But it must be lived forward. - Søren Kierkegaard
+To be is to be perceived. - George Berkeley
+Entities should not be multiplied unnecessarily. - William of Ockham
+The brave man is he who overcomes not only his enemies but his pleasures. - Democritus
+War is nothing but a continuation of politics with the admixture of other means. - Carl von Clausewitz
+The price of greatness is responsibility. - Winston Churchill
+Everything has been figured out, except how to live. - Jean-Paul Sartre
+I would never die for my beliefs because I might be wrong. - Bertrand Russell
+It is not enough to have a good mind; the main thing is to use it well. - René Descartes
+One cannot step twice in the same river. - Heraclitus
+The will to power. - Friedrich Nietzsche
+Hell is other people. - Jean-Paul Sartre
+To be is to do. - Immanuel Kant
+To do is to be. - Jean-Paul Sartre
+The only thing I know is that I know nothing. - Socrates
+Liberty consists in doing what one desires. - John Stuart Mill
+Man is condemned to be free. - Jean-Paul Sartre
+He who has a why to live can bear almost any how. - Friedrich Nietzsche
+Without music, life would be a mistake. - Friedrich Nietzsche
+We are what we repeatedly do. Excellence, then, is not an act, but a habit. - Aristotle
+The unexamined life is not worth living. - Socrates
+God is dead. - Friedrich Nietzsche
+The end justifies the means. - Niccolò Machiavelli
+The mind is furnished with ideas by experience alone. - John Locke
+The greatest happiness of the greatest number is the foundation of morals and legislation. - Jeremy Bentham
+He who thinks great thoughts, often makes great errors. - Martin Heidegger
+That which does not kill us makes us stronger. - Friedrich Nietzsche
+Happiness depends upon ourselves. - Aristotle
+There is only one good, knowledge, and one evil, ignorance. - Socrates
+If God did not exist, it would be necessary to invent Him. - Voltaire
+Happiness is the highest good. - Aristotle
