@@ -7,5 +7,5 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Set initial volume
-    bgMusic.volume = volumeSlider.value = 0.5;
+    bgMusic.volume = volumeSlider.value = 0.25;
 });

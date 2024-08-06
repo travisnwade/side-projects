@@ -53,8 +53,10 @@ body, html {
     width: 24px;
     height: 24px;
     margin-right: 10px;
+    fill: yellow;
 }
 
 #volumeSlider {
     width: 150px;
+    cursor: pointer; /* Change cursor to pointing finger when hovering over slider */
 }
