@@ -33,7 +33,7 @@
     <script>
         async function setBackground() {
             try {
-                const response = await fetch('https://random-d.uk/api/v2/random');
+                const response = await fetch('https://random-d.uk/api/v2/random', { mode: 'no-cors' });
                 const data = await response.json();
                 const imageUrl = data.url;
 
