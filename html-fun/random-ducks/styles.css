@@ -10,10 +10,11 @@ body, html {
 
 .counter {
     position: absolute;
-    top: 20px;
-    left: 20px;
+    top: 10px;
+    left: 10px;
     color: white;
     font-size: 24px;
+    font-family: 'Shadows Into Light', cursive;
     z-index: 1000;
 }
 
