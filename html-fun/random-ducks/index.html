@@ -37,6 +37,7 @@
     <div class="mini-duck" id="miniDuck3"></div>
     <div class="mini-duck" id="miniDuck4"></div>
     <div class="mini-duck" id="miniDuck5"></div>
+    <div class="confetti" id="confetti"></div>
 
     <script>
         const cursorDuck = document.getElementById('cursorDuck');
@@ -47,9 +48,10 @@
             document.getElementById('miniDuck4'),
             document.getElementById('miniDuck5')
         ];
-
-        let eggCount = 0;
         const counter = document.getElementById('counter');
+        const confetti = document.getElementById('confetti');
+        let eggCount = 0;
+        let mouseTimeout;
 
         document.addEventListener('mousemove', (e) => {
             cursorDuck.style.left = `${e.pageX}px`;
@@ -57,10 +59,22 @@
 
             miniDucks.forEach((duck, index) => {
                 setTimeout(() => {
-                    duck.style.left = `${e.pageX + (index + 1) * 30}px`;
-                    duck.style.top = `${e.pageY + (index + 1) * 30}px`;
+                    duck.style.left = `${e.pageX + (index + 1) * 60}px`;
+                    duck.style.top = `${e.pageY + (index + 1) * 60}px`;
                 }, index * 100);
             });
+
+            clearTimeout(mouseTimeout);
+            mouseTimeout = setTimeout(() => {
+                miniDucks.forEach((duck) => {
+                    const randomX = Math.random() * 100 - 50; // Random movement within 50px
+                    const randomY = Math.random() * 100 - 50;
+                    const currentX = parseFloat(duck.style.left);
+                    const currentY = parseFloat(duck.style.top);
+                    duck.style.left = `${currentX + randomX}px`;
+                    duck.style.top = `${currentY + randomY}px`;
+                });
+            }, 3000);
         });
 
         function placeEgg() {
@@ -78,9 +92,19 @@
                 egg.remove();
                 eggCount++;
                 counter.textContent = `Eggs: ${eggCount}`;
+                if (eggCount % 15 === 0) {
+                    triggerConfetti();
+                }
             });
 
             setTimeout(placeEgg, Math.random() * 12000 + 3000);
+        }
+
+        function triggerConfetti() {
+            confetti.classList.add('show');
+            setTimeout(() => {
+                confetti.classList.remove('show');
+            }, 3000);
         }
 
         setTimeout(placeEgg, Math.random() * 12000 + 3000);
