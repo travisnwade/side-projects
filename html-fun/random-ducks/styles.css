@@ -18,15 +18,15 @@ body, html {
 }
 
 .mini-duck {
-    width: 20px;
-    height: 20px;
+    width: 30px;
+    height: 30px;
     opacity: 0.9;
 }
 
 .egg {
     position: absolute;
-    width: 20px;
-    height: 28px;
+    width: 32px;
+    height: 32px;
     background-image: url('/assets/egg.svg');
     background-size: cover;
 }
