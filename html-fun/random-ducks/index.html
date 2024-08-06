@@ -47,10 +47,9 @@
             document.getElementById('miniDuck4'),
             document.getElementById('miniDuck5')
         ];
-        const counter = document.getElementById('counter');
+
         let eggCount = 0;
-        let mouseTimeout;
-        let wanderingInterval;
+        const counter = document.getElementById('counter');
 
         document.addEventListener('mousemove', (e) => {
             cursorDuck.style.left = `${e.pageX}px`;
@@ -62,24 +61,7 @@
                     duck.style.top = `${e.pageY + (index + 1) * 30}px`;
                 }, index * 100);
             });
-
-            clearTimeout(mouseTimeout);
-            clearInterval(wanderingInterval);
-            mouseTimeout = setTimeout(startWandering, 3000);
         });
-
-        function startWandering() {
-            wanderingInterval = setInterval(() => {
-                miniDucks.forEach((duck) => {
-                    const randomX = Math.random() * 100 - 50; // Random movement within 50px
-                    const randomY = Math.random() * 100 - 50;
-                    const currentX = parseFloat(duck.style.left);
-                    const currentY = parseFloat(duck.style.top);
-                    duck.style.left = `${currentX + randomX}px`;
-                    duck.style.top = `${currentY + randomY}px`;
-                });
-            }, 1000);
-        }
 
         function placeEgg() {
             const egg = document.createElement('div');
