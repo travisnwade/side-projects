@@ -162,7 +162,7 @@ Resources:
         - IpProtocol: tcp
           FromPort: 22
           ToPort: 22
-          CidrIp: 73.234.7.17/32
+          CidrIp: x.x.x.x/32
       Tags:
         - Key: Name
           Value: public-instance-sg
