@@ -102,6 +102,7 @@
                 egg.remove();
                 eggCount++;
                 counter.textContent = `Eggs: ${eggCount}`;
+                popSound.currentTime = 0; // Rewind to the start
                 popSound.play();
             });
 
