@@ -10,15 +10,12 @@ body, html {
 
 .cursor-duck, .mini-duck {
     position: absolute;
-    width: 32px;
-    height: 32px;
-    background-image: url('https://random-d.uk/api/v2/randomimg');
-    background-size: cover;
+    font-size: 32px; /* Adjust the size as needed */
+    color: yellow; /* Adjust the color as needed */
     pointer-events: none;  /* Make sure the ducks don't capture mouse events */
 }
 
 .mini-duck {
-    width: 20px;
-    height: 20px;
+    font-size: 20px; /* Adjust the size as needed */
     opacity: 0.8;
 }
