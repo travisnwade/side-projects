@@ -58,9 +58,9 @@
 
             miniDucks.forEach((duck, index) => {
                 setTimeout(() => {
-                    duck.style.left = `${e.pageX + (index + 1) * 50}px`;
-                    duck.style.top = `${e.pageY}px`;
-                }, index * 50);
+                    duck.style.left = `${e.pageX + (index + 1) * 30}px`;
+                    duck.style.top = `${e.pageY + (index + 1) * 30}px`;
+                }, index * 100);
             });
 
             clearTimeout(mouseTimeout);
@@ -72,11 +72,11 @@
             wanderingInterval = setInterval(() => {
                 miniDucks.forEach((duck) => {
                     const randomX = Math.random() * 100 - 50; // Random movement within 50px
-                    const randomY = Math.random() * 50 - 25;
+                    const randomY = Math.random() * 100 - 50;
                     const currentX = parseFloat(duck.style.left);
                     const currentY = parseFloat(duck.style.top);
-                    duck.style.transition = 'transform 1s';
-                    duck.style.transform = `translate(${randomX}px, ${randomY}px)`;
+                    duck.style.left = `${currentX + randomX}px`;
+                    duck.style.top = `${currentY + randomY}px`;
                 });
             }, 1000);
         }
