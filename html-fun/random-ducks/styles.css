@@ -15,11 +15,18 @@ body, html {
     background-image: url('/assets/duck.svg');
     background-size: cover;
     pointer-events: none;  /* Make sure the ducks don't capture mouse events */
-    transform-origin: center;
 }
 
 .mini-duck {
     width: 20px;
     height: 20px;
     opacity: 0.8;
+}
+
+.egg {
+    position: absolute;
+    width: 20px;
+    height: 28px;
+    background-image: url('/assets/egg.svg');
+    background-size: cover;
 }
