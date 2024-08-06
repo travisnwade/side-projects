@@ -9,11 +9,14 @@ const miniDucks = [
 const counter = document.getElementById('counter');
 const popSound = document.getElementById('popSound');
 const bgMusic = document.getElementById('bgMusic');
+const bird = document.getElementById('bird');
+const birdSound = document.getElementById('birdSound');
 let eggCount = 0;
 let mouseTimeout;
 let wanderingInterval;
 
 bgMusic.play();
+birdSound.volume = 0.5; // Set bird sound to 50%
 
 document.addEventListener('mousemove', (e) => {
     cursorDuck.style.left = `${e.pageX}px`;
@@ -68,3 +71,51 @@ function placeEgg() {
 
 setTimeout(placeEgg, Math.random() * 12000 + 3000);
 startWandering();
+
+function moveBird() {
+    const startPosition = Math.random() * window.innerHeight / 2;
+    const direction = Math.random() > 0.5 ? 'leftToRight' : 'rightToLeft';
+
+    bird.style.top = `${startPosition}px`;
+    bird.style.display = 'block';
+
+    if (direction === 'leftToRight') {
+        bird.style.left = '-100px';
+        bird.style.transform = 'scaleX(1)'; // Ensure bird faces right
+
+        const duration = Math.random() * 5000 + 5000; // Random duration between 5 and 10 seconds
+
+        bird.animate([
+            { left: '-100px' },
+            { left: `${window.innerWidth + 100}px` }
+        ], {
+            duration: duration,
+            easing: 'linear',
+            iterations: 1
+        });
+
+        setTimeout(() => birdSound.play(), 250);
+        setTimeout(() => bird.style.display = 'none', duration);
+    } else {
+        bird.style.left = `${window.innerWidth + 100}px`;
+        bird.style.transform = 'scaleX(-1)'; // Ensure bird faces left
+
+        const duration = Math.random() * 5000 + 5000; // Random duration between 5 and 10 seconds
+
+        bird.animate([
+            { left: `${window.innerWidth + 100}px` },
+            { left: '-100px' }
+        ], {
+            duration: duration,
+            easing: 'linear',
+            iterations: 1
+        });
+
+        setTimeout(() => birdSound.play(), 250);
+        setTimeout(() => bird.style.display = 'none', duration);
+    }
+
+    setTimeout(moveBird, Math.random() * 5000 + 5000);
+}
+
+setTimeout(moveBird, Math.random() * 5000 + 5000);

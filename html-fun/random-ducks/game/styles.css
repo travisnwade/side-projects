@@ -144,3 +144,10 @@ body, html {
 #volumeSlider::-webkit-slider-runnable-track {
     background: linear-gradient(to right, yellow 0%, yellow calc(var(--volume) * 100%), gray calc(var(--volume) * 100%), gray 100%);
 }
+
+.bird {
+    position: absolute;
+    width: 80px;
+    height: 80px;
+    display: none; /* Hidden initially */
+}
