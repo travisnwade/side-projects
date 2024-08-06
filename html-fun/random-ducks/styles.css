@@ -10,8 +10,8 @@ body, html {
 
 .cursor-duck, .mini-duck {
     position: absolute;
-    width: 32px;
-    height: 32px;
+    width: 50px;
+    height: 50px;
     background-image: url('/assets/duck.svg');
     background-size: cover;
     pointer-events: none;  /* Make sure the ducks don't capture mouse events */
@@ -20,7 +20,7 @@ body, html {
 .mini-duck {
     width: 20px;
     height: 20px;
-    opacity: 0.8;
+    opacity: 0.9;
 }
 
 .egg {
