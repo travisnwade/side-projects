@@ -35,11 +35,12 @@ body {
 
 .star {
     position: absolute;
-    width: 5px;
-    height: 5px;
+    width: 7px;
+    height: 7px;
     background: white;
     border-radius: 50%;
     pointer-events: none;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
     animation: fall 3s linear infinite;
 }
 
