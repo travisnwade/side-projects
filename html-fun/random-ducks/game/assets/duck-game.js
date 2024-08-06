@@ -24,8 +24,8 @@ document.addEventListener('mousemove', (e) => {
 
     miniDucks.forEach((duck, index) => {
         setTimeout(() => {
-            duck.style.left = `${e.pageX + (index + 1) * 60}px`;
-            duck.style.top = `${e.pageY + (index + 1) * 60}px`;
+            duck.style.left = `${e.pageX + (index + 1) * 40}px`;
+            duck.style.top = `${e.pageY + (index + 1) * 40}px`;
         }, index * 100);
     });
 
