@@ -8,6 +8,7 @@ body {
     background: url('daisy.jpg') no-repeat center center fixed;
     background-size: cover;
     position: relative;
+    overflow: hidden;
 }
 
 .overlay {
@@ -30,4 +31,25 @@ body {
     box-shadow: 0 0 10px rgba(0,0,0,0.1);
     z-index: 2;
     position: relative;
+}
+
+.star {
+    position: absolute;
+    width: 5px;
+    height: 5px;
+    background: white;
+    border-radius: 50%;
+    pointer-events: none;
+    animation: fall 3s linear infinite;
+}
+
+@keyframes fall {
+    0% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    100% {
+        opacity: 0;
+        transform: translateY(500px);
+    }
 }
