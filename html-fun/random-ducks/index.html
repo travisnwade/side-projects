@@ -46,16 +46,25 @@
             document.getElementById('miniDuck5')
         ];
 
+        let lastX = window.innerWidth / 2;
+        let lastY = window.innerHeight / 2;
+
         document.addEventListener('mousemove', (e) => {
+            const angle = Math.atan2(e.pageY - lastY, e.pageX - lastX) * 180 / Math.PI;
             cursorDuck.style.left = `${e.pageX}px`;
             cursorDuck.style.top = `${e.pageY}px`;
+            cursorDuck.style.transform = `rotate(${angle}deg)`;
 
             miniDucks.forEach((duck, index) => {
                 setTimeout(() => {
                     duck.style.left = `${e.pageX + (index + 1) * 20}px`;
                     duck.style.top = `${e.pageY + (index + 1) * 20}px`;
+                    duck.style.transform = `rotate(${angle}deg)`;
                 }, index * 100);
             });
+
+            lastX = e.pageX;
+            lastY = e.pageY;
         });
     </script>
 </body>
