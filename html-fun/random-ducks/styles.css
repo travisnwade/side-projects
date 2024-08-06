@@ -27,3 +27,25 @@ body {
 .button:hover {
     background-color: #d1d100;
 }
+
+.duck-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px; /* Adjust this value to position the duck above the button */
+}
+
+.duck-icon {
+    width: 80px;
+    height: 80px;
+    animation: float 2s ease-in-out infinite;
+}
+
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+}
