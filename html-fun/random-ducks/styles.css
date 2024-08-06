@@ -10,12 +10,15 @@ body, html {
 
 .cursor-duck, .mini-duck {
     position: absolute;
-    font-size: 32px; /* Adjust the size as needed */
-    color: yellow; /* Adjust the color as needed */
+    width: 32px;
+    height: 32px;
+    background-image: url('/assets/duck.svg');
+    background-size: cover;
     pointer-events: none;  /* Make sure the ducks don't capture mouse events */
 }
 
 .mini-duck {
-    font-size: 20px; /* Adjust the size as needed */
+    width: 20px;
+    height: 20px;
     opacity: 0.8;
 }
