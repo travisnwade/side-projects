@@ -147,7 +147,8 @@ body, html {
 
 .bird {
     position: absolute;
-    width: 100px;
-    height: 100px;
+    width: 80px;
+    height: 80px;
     display: none; /* Hidden initially */
+    filter: brightness(0) saturate(100%) invert(73%) sepia(45%) saturate(377%) hue-rotate(153deg) brightness(95%) contrast(88%);
 }
