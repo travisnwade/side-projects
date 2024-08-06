@@ -8,6 +8,15 @@ body, html {
     cursor: none;  /* Hide the default cursor */
 }
 
+.counter {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    color: white;
+    font-size: 24px;
+    z-index: 1000;
+}
+
 .cursor-duck, .mini-duck {
     position: absolute;
     width: 50px;
@@ -18,15 +27,15 @@ body, html {
 }
 
 .mini-duck {
-    width: 30px;
-    height: 30px;
+    width: 25px;
+    height: 25px;
     opacity: 0.9;
 }
 
 .egg {
     position: absolute;
-    width: 32px;
-    height: 32px;
+    width: 30px;
+    height: 30px;
     background-image: url('/assets/egg.svg');
     background-size: cover;
 }

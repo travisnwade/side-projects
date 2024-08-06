@@ -29,6 +29,7 @@
 
 </head>
 <body>
+    <div class="counter" id="counter">Eggs: 0</div>
     <div class="cursor-duck" id="cursorDuck"></div>
     <div class="mini-duck" id="miniDuck1"></div>
     <div class="mini-duck" id="miniDuck2"></div>
@@ -46,14 +47,17 @@
             document.getElementById('miniDuck5')
         ];
 
+        let eggCount = 0;
+        const counter = document.getElementById('counter');
+
         document.addEventListener('mousemove', (e) => {
             cursorDuck.style.left = `${e.pageX}px`;
             cursorDuck.style.top = `${e.pageY}px`;
 
             miniDucks.forEach((duck, index) => {
                 setTimeout(() => {
-                    duck.style.left = `${e.pageX + (index + 1) * 20}px`;
-                    duck.style.top = `${e.pageY + (index + 1) * 20}px`;
+                    duck.style.left = `${e.pageX + (index + 1) * 30}px`;
+                    duck.style.top = `${e.pageY + (index + 1) * 30}px`;
                 }, index * 100);
             });
         });
@@ -71,6 +75,8 @@
 
             egg.addEventListener('mouseenter', () => {
                 egg.remove();
+                eggCount++;
+                counter.textContent = `Eggs: ${eggCount}`;
             });
 
             setTimeout(placeEgg, Math.random() * 12000 + 3000);
